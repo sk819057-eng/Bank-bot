@@ -8,7 +8,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # Aapka naya Permanent System User Token
-ACCESS_TOKEN = "EAAldROaCg6IBSzcJMwaF74WC1ZBfFCuDIUAq2lspsnmHE1OHeAxthpyOxFqZAonrIuy1ZAHQUhLcO9nTHt7ou6yIOMbSmVfW6zjBM0o9PvlTX6xr8sj2Lf4MAtiK9pFk53gpKjyV7sIKOAeWKmD3gsp6LBNo437zyQ3oBZBiFnJeLvp3weG1cUniBP5uQwZDZD"
+ACCESS_TOKEN = "EAAldROaCg6IBS97fVAGfullM9bhjH1nb66ROXElEHnhexFkiWD3CieVlQiRhvn8xixFx0z6dkxMO3hew51zTU2CilP41OprQdQMUDCGeQZCshJCwciyLpiIygTWTTyQwqZBvM2Qxy1eqryFjr9w81IEPtyLHpKTZAfCRWZBeNGs6EhhPtu9dxSIHGrxMZCwZDZD"
 PHONE_NUMBER_ID = "1421467811049942"
 VERIFY_TOKEN = "bank123"
 
