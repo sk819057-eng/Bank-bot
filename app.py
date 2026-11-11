@@ -7,8 +7,8 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Aapka naya generated Meta Access Token
-ACCESS_TOKEN = "EAAldROaCg6IBS192U8gLal1H3yqAquZCgnw8KnKSEtoiaMNP8NhQu7RREjZCtZB9ZBb07l1Y1n0KOHpN9NmwbcMwEA6CsgVJuWsWT3LMwoup1e7UeZCwlz5vTv8YDXiDc36VT7VhVaJ5mt1MutpVUGd07T6ZCMdf4ZCWaq0gvmkNhjta2bXZB2zZBZCwawWVWvuNJjCPb6tA7ssh14X1ZCPKuZB8dk3oVZBGfh4NaJ9k5sTlBZCST7ViD6s9LZCZCKWF4nchNBN6wCZBCauxVNW5ZCXPNBU7GZA"
+# Aapka naya Permanent System User Token
+ACCESS_TOKEN = "EAAldROaCg6IBSzcJMwaF74WC1ZBfFCuDIUAq2lspsnmHE1OHeAxthpyOxFqZAonrIuy1ZAHQUhLcO9nTHt7ou6yIOMbSmVfW6zjBM0o9PvlTX6xr8sj2Lf4MAtiK9pFk53gpKjyV7sIKOAeWKmD3gsp6LBNo437zyQ3oBZBiFnJeLvp3weG1cUniBP5uQwZDZD"
 PHONE_NUMBER_ID = "1421467811049942"
 VERIFY_TOKEN = "bank123"
 
@@ -44,7 +44,7 @@ def webhook():
                     for msg in value['messages']:
                         sender = msg.get('from')
 
-                        # User koi bhi normal text bheje
+                        # User sends 'Hi' ya koi bhi text message
                         if msg.get('type') == 'text':
                             payload = {
                                 "messaging_product": "whatsapp",
@@ -132,7 +132,7 @@ def webhook():
                                     send_whatsapp(payload)
 
                                 elif selected_id == "acc_num_3596":
-                                    # Message 1: Star ke sath exact balance text (*₹ 27572.00)
+                                    # Message 1: Exact balance text
                                     balance_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -195,4 +195,3 @@ def webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-                                                        
