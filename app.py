@@ -1,12 +1,13 @@
 import os
 import sys
 import json
+import time
 import requests
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Aapka provide kiya gaya access token
+# Aapka Meta Access Token
 ACCESS_TOKEN = "EAAldROaCg6IBS2riGhKiAX8F5c5xKBJPX6CDCZBNR6Enhg99tp2ZC7lFhsWQsPEz4zQkK3WHcnEVcDRIO4lHdSweaDw9k1MIdaqqlQPOSsCZBhHQ1ZAWF2y2d0s0XpEjK7J3w0usxTDCXN4YF2bOhZCZB35yZAt4adW4U5i5zGi6WRUf63osCBHURzj7y1oRxD4f5OJKvoxzlwtTp4CKXfA2sQxX5iKezTaRVswY9wx0ix2gOY7L44yqut0pjRG3D72KNZBXc1x53xB81BuAJmQOhcVfZCm7fQRGLfwZDZD"
 PHONE_NUMBER_ID = "1421467811049942"
 VERIFY_TOKEN = "bank123"
@@ -19,7 +20,6 @@ def send_whatsapp(payload):
     }
     response = requests.post(url, headers=headers, json=payload)
     print(f"--> META OUTGOING STATUS: {response.status_code}", flush=True)
-    print(f"--> META OUTGOING BODY: {response.text}", flush=True)
     return response
 
 @app.route('/webhook', methods=['GET'])
@@ -34,26 +34,16 @@ def verify():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.get_json(silent=True) or {}
-    print(f"--> INCOMING WEBHOOK DATA: {json.dumps(data)}", flush=True)
-
     try:
         entries = data.get('entry', [])
         for entry in entries:
             for change in entry.get('changes', []):
                 value = change.get('value', {})
-                
-                # Check status updates (sent, delivered, read)
-                if 'statuses' in value:
-                    for s in value['statuses']:
-                        print(f"--> STATUS UPDATE: {s.get('status')} for recipient {s.get('recipient_id')}", flush=True)
-
-                # Check user incoming messages
                 if 'messages' in value:
                     for msg in value['messages']:
                         sender = msg.get('from')
-                        print(f"--> INCOMING MESSAGE FROM: {sender}", flush=True)
 
-                        # User sends 'Hi', 'Hello' or text
+                        # Text Message Trigger
                         if msg.get('type') == 'text':
                             text = msg.get('text', {}).get('body', '').strip().lower()
                             if any(k in text for k in ['hi', 'hello', 'menu', 'namaste']):
@@ -84,7 +74,6 @@ def webhook():
                                 }
                                 send_whatsapp(payload)
                             else:
-                                # Default fallback text response
                                 fallback_payload = {
                                     "messaging_product": "whatsapp",
                                     "to": sender,
@@ -96,8 +85,6 @@ def webhook():
                         # Interactive List Selection
                         elif msg.get('type') == 'interactive':
                             interaction = msg.get('interactive', {})
-                            
-                            # List replies
                             if interaction.get('type') == 'list_reply':
                                 selected_id = interaction.get('list_reply', {}).get('id')
 
@@ -153,13 +140,29 @@ def webhook():
                                     send_whatsapp(payload)
 
                                 elif selected_id == "acc_num_3596":
-                                    payload = {
+                                    # Message 1: Exact Balance Message
+                                    balance_msg = {
+                                        "messaging_product": "whatsapp",
+                                        "to": sender,
+                                        "type": "text",
+                                        "text": {
+                                            "body": "Dear Customer, current available balance in your selected Account is *₹ 27572.00*"
+                                        }
+                                    }
+                                    send_whatsapp(balance_msg)
+
+                                    time.sleep(0.5)
+
+                                    # Message 2: Yes / No Option
+                                    followup_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
                                         "type": "interactive",
                                         "interactive": {
                                             "type": "button",
-                                            "body": {"text": "Dear Customer, current available balance in your selected Account is *₹ 17,572.00*\n\nWould you like to know anything else?"},
+                                            "body": {
+                                                "text": "Would you like to know anything else?\nKindly, select an option:"
+                                            },
                                             "action": {
                                                 "buttons": [
                                                     {"type": "reply", "reply": {"id": "btn_yes", "title": "Yes"}},
@@ -168,7 +171,7 @@ def webhook():
                                             }
                                         }
                                     }
-                                    send_whatsapp(payload)
+                                    send_whatsapp(followup_msg)
 
                             # Button replies
                             elif interaction.get('type') == 'button_reply':
@@ -200,4 +203,4 @@ def webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-                                    
+    
