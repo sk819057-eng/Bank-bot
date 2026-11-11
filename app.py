@@ -7,8 +7,8 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Aapka Meta Access Token
-ACCESS_TOKEN = "EAAldROaCg6IBS2riGhKiAX8F5c5xKBJPX6CDCZBNR6Enhg99tp2ZC7lFhsWQsPEz4zQkK3WHcnEVcDRIO4lHdSweaDw9k1MIdaqqlQPOSsCZBhHQ1ZAWF2y2d0s0XpEjK7J3w0usxTDCXN4YF2bOhZCZB35yZAt4adW4U5i5zGi6WRUf63osCBHURzj7y1oRxD4f5OJKvoxzlwtTp4CKXfA2sQxX5iKezTaRVswY9wx0ix2gOY7L44yqut0pjRG3D72KNZBXc1x53xB81BuAJmQOhcVfZCm7fQRGLfwZDZD"
+# Aapka naya generated Meta Access Token
+ACCESS_TOKEN = "EAAldROaCg6IBS192U8gLal1H3yqAquZCgnw8KnKSEtoiaMNP8NhQu7RREjZCtZB9ZBb07l1Y1n0KOHpN9NmwbcMwEA6CsgVJuWsWT3LMwoup1e7UeZCwlz5vTv8YDXiDc36VT7VhVaJ5mt1MutpVUGd07T6ZCMdf4ZCWaq0gvmkNhjta2bXZB2zZBZCwawWVWvuNJjCPb6tA7ssh14X1ZCPKuZB8dk3oVZBGfh4NaJ9k5sTlBZCST7ViD6s9LZCZCKWF4nchNBN6wCZBCauxVNW5ZCXPNBU7GZA"
 PHONE_NUMBER_ID = "1421467811049942"
 VERIFY_TOKEN = "bank123"
 
@@ -20,6 +20,7 @@ def send_whatsapp(payload):
     }
     response = requests.post(url, headers=headers, json=payload)
     print(f"--> META OUTGOING STATUS: {response.status_code}", flush=True)
+    print(f"--> META OUTGOING BODY: {response.text}", flush=True)
     return response
 
 @app.route('/webhook', methods=['GET'])
@@ -43,48 +44,39 @@ def webhook():
                     for msg in value['messages']:
                         sender = msg.get('from')
 
-                        # Text Message Trigger
+                        # User koi bhi normal text bheje
                         if msg.get('type') == 'text':
-                            text = msg.get('text', {}).get('body', '').strip().lower()
-                            if any(k in text for k in ['hi', 'hello', 'menu', 'namaste']):
-                                payload = {
-                                    "messaging_product": "whatsapp",
-                                    "to": sender,
-                                    "type": "interactive",
-                                    "interactive": {
-                                        "type": "list",
-                                        "header": {"type": "text", "text": "Bihar Gramin Bank"},
-                                        "body": {"text": "Welcome to BIHAR GRAMIN BANK WhatsApp Banking Services 🏦"},
-                                        "footer": {"text": "Tap below 👇 to explore All Services"},
-                                        "action": {
-                                            "button": "All Services",
-                                            "sections": [
-                                                {
-                                                    "title": "Select a Service",
-                                                    "rows": [
-                                                        {"id": "acc_services", "title": "Account Related Services", "description": "Check account details & balance"},
-                                                        {"id": "bank_prod", "title": "Bank Products", "description": "Deposits, loans, govt schemes"},
-                                                        {"id": "online_services", "title": "Online Services", "description": "Mobile banking, portal links"},
-                                                        {"id": "other_services", "title": "Other services", "description": "Branch & ATM locator"}
-                                                    ]
-                                                }
-                                            ]
-                                        }
+                            payload = {
+                                "messaging_product": "whatsapp",
+                                "to": sender,
+                                "type": "interactive",
+                                "interactive": {
+                                    "type": "list",
+                                    "header": {"type": "text", "text": "Bihar Gramin Bank"},
+                                    "body": {"text": "Welcome to BIHAR GRAMIN BANK WhatsApp Banking Services 🏦"},
+                                    "footer": {"text": "Tap below 👇 to explore All Services"},
+                                    "action": {
+                                        "button": "All Services",
+                                        "sections": [
+                                            {
+                                                "title": "Select a Service",
+                                                "rows": [
+                                                    {"id": "acc_services", "title": "Account Related Services", "description": "Check account details & balance"},
+                                                    {"id": "bank_prod", "title": "Bank Products", "description": "Deposits, loans, govt schemes"},
+                                                    {"id": "online_services", "title": "Online Services", "description": "Mobile banking, portal links"},
+                                                    {"id": "other_services", "title": "Other services", "description": "Branch & ATM locator"}
+                                                ]
+                                            }
+                                        ]
                                     }
                                 }
-                                send_whatsapp(payload)
-                            else:
-                                fallback_payload = {
-                                    "messaging_product": "whatsapp",
-                                    "to": sender,
-                                    "type": "text",
-                                    "text": {"body": "Welcome to Bihar Gramin Bank! Kripya 'Hi' bhej kar main menu dekhein."}
-                                }
-                                send_whatsapp(fallback_payload)
+                            }
+                            send_whatsapp(payload)
 
-                        # Interactive List Selection
+                        # Dropdown Lists Selection
                         elif msg.get('type') == 'interactive':
                             interaction = msg.get('interactive', {})
+                            
                             if interaction.get('type') == 'list_reply':
                                 selected_id = interaction.get('list_reply', {}).get('id')
 
@@ -140,20 +132,20 @@ def webhook():
                                     send_whatsapp(payload)
 
                                 elif selected_id == "acc_num_3596":
-                                    # Message 1: Exact Balance Message
+                                    # Message 1: Star ke sath exact balance text (*₹ 27572.00)
                                     balance_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
                                         "type": "text",
                                         "text": {
-                                            "body": "Dear Customer, current available balance in your selected Account is *₹ 27572.00*"
+                                            "body": "Dear Customer, current available balance in your selected Account is *₹ 27572.00"
                                         }
                                     }
                                     send_whatsapp(balance_msg)
 
                                     time.sleep(0.5)
 
-                                    # Message 2: Yes / No Option
+                                    # Message 2: Yes / No Option Buttons
                                     followup_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -173,7 +165,7 @@ def webhook():
                                     }
                                     send_whatsapp(followup_msg)
 
-                            # Button replies
+                            # Button replies (Yes / No)
                             elif interaction.get('type') == 'button_reply':
                                 btn_id = interaction.get('button_reply', {}).get('id')
 
@@ -203,4 +195,4 @@ def webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+                                                        
