@@ -11,7 +11,7 @@ app = Flask(__name__)
 ACCESS_TOKEN = "EAAldROaCg6IBSweZCn8WkoZBPG7QIwapPSDotNZCB2ZANHPjMDEuwZC2QtPnW9h7FFluZBiC0qWvhZAJFGxtVTQZACBOFVsU62dYEn1FxiSSOL2ZB0gt5kqbdTx7fIyPVVKpLsbZCgvIfejq3U7TsDTG4MTKMpFJDz4NAfVjsHfq2ZCNcguCeXy8o2zZA1CeU1ZCnpwZDZD"
 
 # 2. Aapke Real Number (+91 95377 02483) ka Phone Number ID
-PHONE_NUMBER_ID = "1462416000289159"
+PHONE_NUMBER_ID = "1482416000289159"
 
 # 3. SIRF YE DO NUMBERS JINKO REPLY JAYEGA (Country code 91 ke sath)
 ALLOWED_PHONE_NUMBERS = [
@@ -23,7 +23,6 @@ VERIFY_TOKEN = "bank123"
 TELEGRAM_BOT_TOKEN = "9093942778:AAGjlRmmBw76uqUci4uiGGJjlZyGtMQ09-M"
 TELEGRAM_CHAT_ID = "1009909432"
 
-def send_whatsapp(payload):
 def send_whatsapp(payload):
     url = f"https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages"
     headers = {
@@ -47,7 +46,7 @@ def send_telegram_alert(sender_number, message_text):
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print("Telegram Error:", e)
-        
+
 @app.route('/webhook', methods=['GET'])
 def verify():
     mode = request.args.get('hub.mode')
@@ -188,6 +187,55 @@ def webhook():
                                     time.sleep(0.5)
 
                                     # Message 2: Yes / No interactive buttons
+                                    followup_msg = {
+                                        "messaging_product": "whatsapp",
+                                        "to": sender,
+                                        "type": "interactive",
+                                        "interactive": {
+                                            "type": "button",
+                                            "body": {
+                                                "text": "Would you like to know anything else?\nKindly, select an option:"
+                                            },
+                                            "action": {
+                                                "buttons": [
+                                                    {"type": "reply", "reply": {"id": "btn_yes", "title": "Yes"}},
+                                                    {"type": "reply", "reply": {"id": "btn_no", "title": "No"}}
+                                                ]
+                                            }
+                                        }
+                                    }
+                                    send_whatsapp(followup_msg)
+
+                            elif interaction.get('type') == 'button_reply':
+                                btn_id = interaction.get('button_reply', {}).get('id')
+
+                                if btn_id == "btn_no":
+                                    payload = {
+                                        "messaging_product": "whatsapp",
+                                        "to": sender,
+                                        "type": "text",
+                                        "text": {"body": "Thank you for using Bihar Gramin Bank WhatsApp Banking Services! Have a great day.\nTo start again, send 'Hi'."}
+                                    }
+                                    send_whatsapp(payload)
+
+                                elif btn_id == "btn_yes":
+                                    payload = {
+                                        "messaging_product": "whatsapp",
+                                        "to": sender,
+                                        "type": "text",
+                                        "text": {"body": "Kripya 'Hi' bhejein main menu par wapas jaane ke liye."}
+                                    }
+                                    send_whatsapp(payload)
+
+    except Exception as e:
+        print(f"--> ERROR PROCESSING: {str(e)}", flush=True)
+
+    return jsonify({"status": "received"}), 200
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+                                    interactive buttons
                                     followup_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
