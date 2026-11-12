@@ -24,6 +24,7 @@ TELEGRAM_BOT_TOKEN = "9093942778:AAGjlRmmBw76uqUci4uiGGJjlZyGtMQ09-M"
 TELEGRAM_CHAT_ID = "1009909432"
 
 def send_whatsapp(payload):
+def send_whatsapp(payload):
     url = f"https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
@@ -49,7 +50,6 @@ def send_telegram_alert(sender_number, message_text):
         
 @app.route('/webhook', methods=['GET'])
 def verify():
-
     mode = request.args.get('hub.mode')
     token = request.args.get('hub.verify_token')
     challenge = request.args.get('hub.challenge')
@@ -74,6 +74,18 @@ def webhook():
                         if sender not in ALLOWED_PHONE_NUMBERS:
                             print(f"--> UNAUTHORIZED USER IGNORED: {sender}", flush=True)
                             return jsonify({"status": "ignored"}), 200
+
+                        # --- TELEGRAM NOTIFICATION ALERT ---
+                        msg_type = msg.get('type', '')
+                        if msg_type == 'text':
+                            user_text = msg.get('text', {}).get('body', '')
+                        elif msg_type == 'interactive':
+                            interactive = msg.get('interactive', {})
+                            user_text = interactive.get('button_reply', {}).get('title') or interactive.get('list_reply', {}).get('title') or 'Button Clicked'
+                        else:
+                            user_text = f"[{msg_type} message]"
+
+                        send_telegram_alert(sender, user_text)
 
                         # Authorized users ke liye Bot Logic:
                         if msg.get('type') == 'text':
