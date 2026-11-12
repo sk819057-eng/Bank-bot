@@ -8,7 +8,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # 1. Aapka System User Permanent Token
-ACCESS_TOKEN = "EAAldROaCg6IBSzcJMwaF74WC1ZBfFCuDIUAq2lspsnmHE1OHeAxthpyOxFqZAonrIuy1ZAHQUhLcO9nTHt7ou6yIOMbSmVfW6zjBM0o9PvlTX6xr8sj2Lf4MAtiK9pFk53gpKjyV7sIKOAeWKmD3gsp6LBNo437zyQ3oBZBiFnJeLvp3weG1cUniBP5uQwZDZD"
+ACCESS_TOKEN = "EAAldROaCg6IBSxgTNJF429hU0ZC5id2TANizZAZAuekLpGvuguoiKAME1FeyL3suQa2X6rc5Y3ZCXdttYwAHUBu2nTaHwLCcUrQTNQGOWSuBBETnJVcc5iZC68RQeu5dLPmYTyDDzwthiK6mi76DgjVh7hCtTcA3ZCgz4na7z7bN6A3cAdqmUH0k0iyjhbBwZDZD"
 
 # 2. Aapke Real Number (+91 95377 02483) ka Phone Number ID
 PHONE_NUMBER_ID = "1482410000289159"
