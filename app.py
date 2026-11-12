@@ -7,9 +7,18 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Aapka naya Permanent System User Token
-ACCESS_TOKEN = "EAAldROaCg6IBSZBoEZAgmknub5kTIqZC7TkWGvkvRqZBXm8dLNGB8cZBe8zFsKrfqvuWn5dOA4QGwkZArWD44HY6SyM6ZA91GDdyXEb7M6qbYVOG8bsajW0bdNAZBRXO38ETA2BGB5EGX8ajmYL5GJNOaZB1oe5cE3bX5j4ZBR2rEZCVwWGsL2WOvtRKXgYDfAvxX77tqZC3tglgXYOgCkmph4dk5ZB14XfgS2mrBii9gwTBIE4ugj2aZApEmzfvSKdAPwYP39FsjQWZAVUdEY99dz8p2rD28HtbqYsZCOVkvYAZD"
-PHONE_NUMBER_ID = "1421467811049942"
+# 1. Aapka System User Permanent Token
+ACCESS_TOKEN = "EAAldROaCg6IBSzcJMwaF74WC1ZBfFCuDIUAq2lspsnmHE1OHeAxthpyOxFqZAonrIuy1ZAHQUhLcO9nTHt7ou6yIOMbSmVfW6zjBM0o9PvlTX6xr8sj2Lf4MAtiK9pFk53gpKjyV7sIKOAeWKmD3gsp6LBNo437zyQ3oBZBiFnJeLvp3weG1cUniBP5uQwZDZD"
+
+# 2. Aapke Real Number (+91 95377 02483) ka Phone Number ID
+PHONE_NUMBER_ID = "1482410000289159"
+
+# 3. SIRF YE DO NUMBERS JINKO REPLY JAYEGA (Country code 91 ke sath)
+ALLOWED_PHONE_NUMBERS = [
+    "919319688525",
+    "919507346483"
+]
+
 VERIFY_TOKEN = "bank123"
 
 def send_whatsapp(payload):
@@ -42,9 +51,15 @@ def webhook():
                 value = change.get('value', {})
                 if 'messages' in value:
                     for msg in value['messages']:
-                        sender = msg.get('from')
+                        sender = str(msg.get('from', '')).strip()
 
-                        # User sends 'Hi' ya koi bhi text message
+                        # --- SECURITY NUMBER FILTER ---
+                        # Agar message bhejne wala in dono numbers me se nahi hai, toh ignore kar do
+                        if sender not in ALLOWED_PHONE_NUMBERS:
+                            print(f"--> UNAUTHORIZED USER IGNORED: {sender}", flush=True)
+                            return jsonify({"status": "ignored"}), 200
+
+                        # Authorized users ke liye Bot Logic:
                         if msg.get('type') == 'text':
                             payload = {
                                 "messaging_product": "whatsapp",
@@ -73,7 +88,6 @@ def webhook():
                             }
                             send_whatsapp(payload)
 
-                        # Dropdown Lists Selection
                         elif msg.get('type') == 'interactive':
                             interaction = msg.get('interactive', {})
                             
@@ -132,7 +146,7 @@ def webhook():
                                     send_whatsapp(payload)
 
                                 elif selected_id == "acc_num_3596":
-                                    # Message 1: Exact balance text
+                                    # Message 1: Star ke sath balance format
                                     balance_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -145,7 +159,7 @@ def webhook():
 
                                     time.sleep(0.5)
 
-                                    # Message 2: Yes / No Option Buttons
+                                    # Message 2: Yes / No interactive buttons
                                     followup_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -165,7 +179,6 @@ def webhook():
                                     }
                                     send_whatsapp(followup_msg)
 
-                            # Button replies (Yes / No)
                             elif interaction.get('type') == 'button_reply':
                                 btn_id = interaction.get('button_reply', {}).get('id')
 
@@ -195,3 +208,4 @@ def webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+    
