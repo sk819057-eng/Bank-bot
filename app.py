@@ -7,13 +7,9 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# 1. Aapka System User Permanent Token
 ACCESS_TOKEN = "EAAldROaCg6IBSweZCn8WkoZBPG7QIwapPSDotNZCB2ZANHPjMDEuwZC2QtPnW9h7FFluZBiC0qWvhZAJFGxtVTQZACBOFVsU62dYEn1FxiSSOL2ZB0gt5kqbdTx7fIyPVVKpLsbZCgvIfejq3U7TsDTG4MTKMpFJDz4NAfVjsHfq2ZCNcguCeXy8o2zZA1CeU1ZCnpwZDZD"
+PHONE_NUMBER_ID = "1462416000289159"
 
-# 2. Aapke Real Number (+91 95377 02483) ka Phone Number ID
-PHONE_NUMBER_ID = "1482416000289159"
-
-# 3. SIRF YE DO NUMBERS JINKO REPLY JAYEGA (Country code 91 ke sath)
 ALLOWED_PHONE_NUMBERS = [
     "919319688525",
     "919507346483"
@@ -68,13 +64,10 @@ def webhook():
                     for msg in value['messages']:
                         sender = str(msg.get('from', '')).strip()
 
-                        # --- SECURITY NUMBER FILTER ---
-                        # Agar message bhejne wala in dono numbers me se nahi hai, toh ignore kar do
                         if sender not in ALLOWED_PHONE_NUMBERS:
                             print(f"--> UNAUTHORIZED USER IGNORED: {sender}", flush=True)
                             return jsonify({"status": "ignored"}), 200
 
-                        # --- TELEGRAM NOTIFICATION ALERT ---
                         msg_type = msg.get('type', '')
                         if msg_type == 'text':
                             user_text = msg.get('text', {}).get('body', '')
@@ -86,7 +79,6 @@ def webhook():
 
                         send_telegram_alert(sender, user_text)
 
-                        # Authorized users ke liye Bot Logic:
                         if msg.get('type') == 'text':
                             payload = {
                                 "messaging_product": "whatsapp",
@@ -173,7 +165,6 @@ def webhook():
                                     send_whatsapp(payload)
 
                                 elif selected_id == "acc_num_3596":
-                                    # Message 1: Star ke sath balance format
                                     balance_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -186,7 +177,6 @@ def webhook():
 
                                     time.sleep(0.5)
 
-                                    # Message 2: Yes / No interactive buttons
                                     followup_msg = {
                                         "messaging_product": "whatsapp",
                                         "to": sender,
@@ -235,53 +225,4 @@ def webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-                                    interactive buttons
-                                    followup_msg = {
-                                        "messaging_product": "whatsapp",
-                                        "to": sender,
-                                        "type": "interactive",
-                                        "interactive": {
-                                            "type": "button",
-                                            "body": {
-                                                "text": "Would you like to know anything else?\nKindly, select an option:"
-                                            },
-                                            "action": {
-                                                "buttons": [
-                                                    {"type": "reply", "reply": {"id": "btn_yes", "title": "Yes"}},
-                                                    {"type": "reply", "reply": {"id": "btn_no", "title": "No"}}
-                                                ]
-                                            }
-                                        }
-                                    }
-                                    send_whatsapp(followup_msg)
-
-                            elif interaction.get('type') == 'button_reply':
-                                btn_id = interaction.get('button_reply', {}).get('id')
-
-                                if btn_id == "btn_no":
-                                    payload = {
-                                        "messaging_product": "whatsapp",
-                                        "to": sender,
-                                        "type": "text",
-                                        "text": {"body": "Thank you for using Bihar Gramin Bank WhatsApp Banking Services! Have a great day.\nTo start again, send 'Hi'."}
-                                    }
-                                    send_whatsapp(payload)
-
-                                elif btn_id == "btn_yes":
-                                    payload = {
-                                        "messaging_product": "whatsapp",
-                                        "to": sender,
-                                        "type": "text",
-                                        "text": {"body": "Kripya 'Hi' bhejein main menu par wapas jaane ke liye."}
-                                    }
-                                    send_whatsapp(payload)
-
-    except Exception as e:
-        print(f"--> ERROR PROCESSING: {str(e)}", flush=True)
-
-    return jsonify({"status": "received"}), 200
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-    
+                                    
