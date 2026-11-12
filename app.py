@@ -18,8 +18,11 @@ ALLOWED_PHONE_NUMBERS = [
     "919319688525",
     "919507346483"
 ]
+send_telegram_alert(sender_number, message_body)
 
 VERIFY_TOKEN = "bank123"
+TELEGRAM_BOT_TOKEN = "9093942778:AAGjlRmmBw76uqUci4uiGGJjlZyGtMQ09-M"
+TELEGRAM_CHAT_ID = "1009909432"
 
 def send_whatsapp(payload):
     url = f"https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages"
@@ -31,7 +34,19 @@ def send_whatsapp(payload):
     print(f"--> META OUTGOING STATUS: {response.status_code}", flush=True)
     print(f"--> META OUTGOING BODY: {response.text}", flush=True)
     return response
-
+def send_telegram_alert(sender_number, message_text):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    alert_msg = f"🔔 *New WhatsApp Alert!*\n\n📱 *Number:* +{sender_number}\n💬 *Message:* {message_text}"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": alert_msg,
+        "parse_mode": "Markdown"
+    }
+    try:
+        requests.post(url, json=payload, timeout=5)
+    except Exception as e:
+        print("Telegram Error:", e)
+        
 @app.route('/webhook', methods=['GET'])
 def verify():
     mode = request.args.get('hub.mode')
