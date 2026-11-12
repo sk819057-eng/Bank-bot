@@ -18,7 +18,6 @@ ALLOWED_PHONE_NUMBERS = [
     "919319688525",
     "919507346483"
 ]
-send_telegram_alert(sender_number, message_body)
 
 VERIFY_TOKEN = "bank123"
 TELEGRAM_BOT_TOKEN = "9093942778:AAGjlRmmBw76uqUci4uiGGJjlZyGtMQ09-M"
@@ -34,6 +33,7 @@ def send_whatsapp(payload):
     print(f"--> META OUTGOING STATUS: {response.status_code}", flush=True)
     print(f"--> META OUTGOING BODY: {response.text}", flush=True)
     return response
+
 def send_telegram_alert(sender_number, message_text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     alert_msg = f"🔔 *New WhatsApp Alert!*\n\n📱 *Number:* +{sender_number}\n💬 *Message:* {message_text}"
@@ -49,6 +49,7 @@ def send_telegram_alert(sender_number, message_text):
         
 @app.route('/webhook', methods=['GET'])
 def verify():
+
     mode = request.args.get('hub.mode')
     token = request.args.get('hub.verify_token')
     challenge = request.args.get('hub.challenge')
