@@ -42,7 +42,10 @@ def send_telegram_alert(sender_number, message_text):
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print("Telegram Error:", e)
-
+@app.route('/', methods=['GET'])
+def home():
+    return "Bank Bot is Active!", 200
+    
 @app.route('/webhook', methods=['GET'])
 def verify():
     mode = request.args.get('hub.mode')
