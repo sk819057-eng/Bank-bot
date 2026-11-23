@@ -173,7 +173,7 @@ def webhook():
                                         "to": sender,
                                         "type": "text",
                                         "text": {
-                                            "body": "Dear Customer, current available balance in your selected Account is *₹ 27572.00"
+                                            "body": "Dear Customer, current available balance in your selected Account is *₹ 27577.00"
                                         }
                                     }
                                     send_whatsapp(balance_msg)
